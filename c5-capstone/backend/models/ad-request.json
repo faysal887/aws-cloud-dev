@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "ad",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "reference_url":{
+      "type": "string"
+    },
+    "price":{
+      "type":"number"
+    }
+  },
+  "required": [
+    "name",
+    "email",
+    "reference_url",
+    "price"
+  ],
+  "additionalProperties": false
+}

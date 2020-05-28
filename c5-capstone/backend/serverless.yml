@@ -1,0 +1,300 @@
+service:
+  name: serverless-udalist-app
+
+plugins:
+  - serverless-webpack
+  - serverless-iam-roles-per-function
+  - serverless-aws-documentation
+  - serverless-reqvalidator-plugin
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+
+  tracing:
+    lambda: true
+    apiGateway: true
+    iamRoleStatements:
+      - Effect: 'Allow' # xray permissions (required)
+        Action:
+          - 'xray:PutTraceSegments'
+          - 'xray:PutTelemetryRecords'
+        Resource:
+          - '*'
+
+  environment:
+    ADS_TABLE: Ads-${self:provider.stage}
+    ADS_INDEX: adIdIndex
+    IMAGES_S3_BUCKET: sls-ad-images-${self:provider.stage}-634886384540
+    URL_EXPIRATION: 300
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - codedeploy:*
+      Resource:
+        - '*'
+
+custom:
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: Ads API
+        description: Serverless application for ad list
+    models:
+      - name: AdRequest
+        contentType: application/json
+        schema: ${file(models/ad-request.json)}
+functions:
+
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
+
+  # TODO: Configure this function
+  GetUserPosts:
+    handler: src/lambda/http/getUserPosts.handler
+    events:
+      - http:
+          method: get
+          path: ads
+          authorizer: Auth
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: 
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}/index/${self:provider.environment.ADS_INDEX}
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource: 
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}/index/${self:provider.environment.ADS_INDEX}
+      - Effect: 'Allow' # xray permissions (required)
+        Action:
+          - 'xray:PutTraceSegments'
+          - 'xray:PutTelemetryRecords'
+        Resource:
+          - '*'
+  # TODO: Configure this function
+  GetAllPosts:
+    handler: src/lambda/http/getAllPosts.handler
+    events:
+      - http:
+          method: get
+          path: ads/all
+          authorizer: Auth
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Scan
+        Resource: 
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}/index/${self:provider.environment.ADS_INDEX}
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource: 
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}/index/${self:provider.environment.ADS_INDEX}
+      - Effect: 'Allow' # xray permissions (required)
+        Action:
+          - 'xray:PutTraceSegments'
+          - 'xray:PutTelemetryRecords'
+        Resource:
+          - '*'
+  # TODO: Configure this function
+  CreatePost:
+    handler: src/lambda/http/createPost.handler
+    events:
+      - http:
+          method: post
+          path: ads
+          authorizer: Auth
+          cors: true
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a new ad item
+            description: Create a new ad item
+            requestModels:
+              'application/json': AdRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: 
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}/index/${self:provider.environment.ADS_INDEX}
+      - Effect: 'Allow' # xray permissions (required)
+        Action:
+          - 'xray:PutTraceSegments'
+          - 'xray:PutTelemetryRecords'
+        Resource:
+          - '*'
+
+  # TODO: Configure this function
+  UpdatePost:
+    handler: src/lambda/http/updatePost.handler
+    events:
+      - http:
+          method: patch
+          path: ads/{adId}
+          authorizer: Auth
+          cors: true
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Update a new ad item
+            description: Update a new ad item
+            requestModels:
+              'application/json': AdRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: 
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}/index/${self:provider.environment.ADS_INDEX}
+      - Effect: 'Allow' # xray permissions (required)
+        Action:
+          - 'xray:PutTraceSegments'
+          - 'xray:PutTelemetryRecords'
+        Resource:
+          - '*'
+  # TODO: Configure this function
+  DeletePost:
+    handler: src/lambda/http/deletePost.handler
+    events:
+      - http:
+          method: delete
+          path: ads/{adId}
+          authorizer: Auth
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: 
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}/index/${self:provider.environment.ADS_INDEX}
+      - Effect: 'Allow' # xray permissions (required)
+        Action:
+          - 'xray:PutTraceSegments'
+          - 'xray:PutTelemetryRecords'
+        Resource:
+          - '*'
+  # TODO: Configure this function
+  GenUploadUrl:
+    handler: src/lambda/http/generateUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: ads/{adId}/attachment
+          authorizer: Auth
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: 
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ADS_TABLE}/index/${self:provider.environment.ADS_INDEX}
+      - Effect: 'Allow' # xray permissions (required)
+        Action:
+          - 'xray:PutTraceSegments'
+          - 'xray:PutTelemetryRecords'
+        Resource:
+          - '*'
+    
+
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,DELETE,PATCH'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+    
+    AttachmentsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.IMAGES_S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+    
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+    
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: MyPolicy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*'
+        Bucket: !Ref AttachmentsBucket      
+
+    AdsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: adId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: adId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.ADS_TABLE}
+        LocalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.ADS_INDEX}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: adId
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL # What attributes will be copied to an index
+

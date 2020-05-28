@@ -1,0 +1,198 @@
+{
+	"info": {
+		"_postman_id": "aa15bd6f-b93a-4b8a-be45-799a8498da89",
+		"name": "Capstone",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "ADs",
+			"item": [
+				{
+					"name": "Get all user ads",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/ads"
+					},
+					"response": []
+				},
+				{
+					"name": "Create ad",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Water flowers\",\n\t\"price\": 1100,\n\t\"location\": \"Oslo\",\n\t\"email\": \"ad_owner@gmail.com\"\n}"
+						},
+						"url": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/ads"
+					},
+					"response": []
+				},
+				{
+					"name": "Update ad",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Spring Water flowers\",\n\t\"price\": 800,\n\t\"location\": \"Stockholm\",\n\t\"email\": \"new_ad_owner@gmail.com\"\n}"
+						},
+						"url": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/ads/cc2b0786-b302-4d7b-aa30-2c1a0002b14b"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete ad",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/ads/fe671583-4512-45f6-9475-4265c04362fb"
+					},
+					"response": []
+				},
+				{
+					"name": "Get attachment URL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/ads/3836b777-9bc4-4429-9b79-ba4e4f5f91c0/attachment"
+					},
+					"response": []
+				},
+				{
+					"name": "Get all ads",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/ads/all"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e9c29965-a7f7-4ad9-b12b-90496a1f4378",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "1cfb19e6-3204-46cf-9243-c9c4c862db60",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "0e738ecc-a1a4-41e0-b2f6-21b1c61b2b27",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "12395cab-1465-4d01-a459-7a445c754ca8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "d227e0b0-7853-40ef-b2f1-de516a009cd6",
+			"key": "apiId",
+			"value": "43qxmr4q6e",
+			"type": "string"
+		},
+		{
+			"id": "14f4b662-85db-4e6e-94f3-a1b54700beca",
+			"key": "authToken",
+			"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJaSENWakZSWXZBR2dBZXIwek1XRSJ9.eyJpc3MiOiJodHRwczovL2Rldi00c2RiY3k4My5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTM4MzUzMTUwMzg4NDg5NzIxMjYiLCJhdWQiOiJQNXIxM2hkM3JiajM3a0xxYjJPc3lqTG52bnR0cHpGRiIsImlhdCI6MTU4OTIzNjE4OCwiZXhwIjoxNTg5NTk2MTg4LCJhdF9oYXNoIjoiS1llSnBTbHpacXBLUWgxVlVLSk9TZyIsIm5vbmNlIjoiMEhWRjRxTDV1czk4QjlNVDZoem5BSHFqS3YyNXlnd1MifQ.S0t1KabzIuCLVeL5ttnL1IaJkeyBiNtiEbvNnktWYRuUmMDj3iK5XBYqxWRgJjfruKuzOizZEPV8zovKvjNjLLRpjQXhgDrhLknFVzYtd-6PcY18rRx8ZDM9QtMSUiL8PKZuAuxscuBTYQSqh34pKWAbYgR5h2tEdREH-usOunhR1lRKPBD0i6yoUk6fqoGZljqof9LOQtURp1UhgbWehrGYKEPdB5YbCRJpCC5aBo141lpUKr34nz7CxJgCMk7-EYQc_977UJbZcLBPPKNb2oQZ6tSoqBRj6g459UFfJf0ECFidy0eXtkMPqp5UIjc7LAkIohVTp41eSUSRTkGLuA",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
